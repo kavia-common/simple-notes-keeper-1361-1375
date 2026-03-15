@@ -1,49 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import { useNotes } from './hooks/useNotes';
+import Header from './components/Header';
+import Sidebar from './components/Sidebar';
+import NoteView from './components/NoteView';
+import NoteEditor from './components/NoteEditor';
+import FloatingAddButton from './components/FloatingAddButton';
 import './App.css';
-
 // PUBLIC_INTERFACE
 function App() {
-  const [theme, setTheme] = useState('light');
-
-  // Effect to apply theme to document element
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
-
-  // PUBLIC_INTERFACE
-  const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
-  };
-
+  var h = useNotes();
+  var sb = useState(false);
+  var sidebarOpen = sb[0];
+  var setSidebarOpen = sb[1];
   return (
     <div className="App">
-      <header className="App-header">
-        <button 
-          className="theme-toggle" 
-          onClick={toggleTheme}
-          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-        >
-          {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-        </button>
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <p>
-          Current theme: <strong>{theme}</strong>
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header />
+      <div className="app-layout">
+        <button className="mobile-menu-toggle" onClick={function(){setSidebarOpen(function(p){return !p;});}} aria-label="Toggle notes sidebar" title="Toggle sidebar">☰</button>
+        <Sidebar notes={h.notes} selectedNoteId={h.selectedNoteId} searchQuery={h.searchQuery} onSearch={h.handleSearch} onSelectNote={h.handleSelectNote} isOpen={sidebarOpen} onClose={function(){setSidebarOpen(false);}} />
+        <main className="main-pane" role="main">
+          {h.isEditing && h.selectedNote ? (
+            <NoteEditor note={h.selectedNote} onSave={function(id,u){h.handleUpdateNote(id,u);h.handleStopEditing();}} onCancel={h.handleStopEditing} onDelete={h.handleDeleteNote} />
+          ) : (
+            <NoteView note={h.selectedNote} onEdit={h.handleStartEditing} onDelete={h.handleDeleteNote} />
+          )}
+        </main>
+        <FloatingAddButton onClick={function(){h.handleCreateNote();setSidebarOpen(false);}} />
+      </div>
     </div>
   );
 }
-
 export default App;

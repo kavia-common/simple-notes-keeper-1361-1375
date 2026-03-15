@@ -14,13 +14,18 @@ export default [
         document: true,
         window: true,
         test: true,
-        expect: true
+        expect: true,
+        beforeEach: true,
+        afterEach: true,
+        describe: true,
+        it: true,
+        jest: true,
+        localStorage: true,
+        console: true
       }
     },
     rules: {
-
-     'no-unused-vars': ['error', { varsIgnorePattern: 'React|App' }]
-
+      'no-unused-vars': ['error', { varsIgnorePattern: 'React|App' }]
     }
   },
   pluginJs.configs.recommended,
